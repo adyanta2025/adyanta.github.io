@@ -3,40 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thank You</title>
+    <title>Document Submission</title>
+    <title>Document Submission</title>
     <style>
         body, html {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
-        .header {
-            background-color: #002147;
-            color: white;
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        button {
             padding: 10px 20px;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            width: 100%;
-            box-sizing: border-box;
+            font-size: 16px;
+            cursor: pointer;
         }
-        .content {
-            text-align: center;
-        }
-        p {
-            font-size: 20px;
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="header">Thank You</div>
-    <div class="content">
-        <p>Your submission has been received. We appreciate your participation.</p>
+    <div class="container">
+        <h1>Document Upload</h1>
+        <p>Please upload your I-20 and I-983 forms here.</p>
+        <form id="uploadForm">
+            <div>
+                <label for="i20">Upload I-20:</label>
+                <input type="file" id="i20" name="i20" required>
+            </div>
+            <div>
+                <label for="i983">Upload I-983:</label>
+                <input type="file" id="i983" name="i983" required>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <p id="thankYouMessage" class="hidden">Thank you! You may now close this window.</p>
     </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            const i20 = document.getElementById('i20').files[0];
+            const i983 = document.getElementById('i983').files[0];
+
+            if (!i20 || !i983) {
+                alert('Please upload both files before submitting.');
+                return;
+            }
+
+            // Normally here you would handle file uploads with a backend server.
+            // For demonstration, we'll just display a message.
+
+            document.getElementById('uploadForm').classList.add('hidden');
+            document.getElementById('thankYouMessage').classList.remove('hidden');
+        });
+    </script>
 </body>
 </html>
