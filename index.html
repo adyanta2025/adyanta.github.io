@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Location Tracker</title>
-</head>
-<body>
-  <h1>Location Tracker</h1>
-  <p>Click the button to share your location:</p>
-  <button id="getLocation">Get Location</button>
-  <p id="output"></p>
+document.getElementById("getLocation").addEventListener("click", function () {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        const accuracy = position.coords.accuracy;
 
+<<<<<<< HEAD
   <!-- JavaScript Code -->
   <script>
     document.getElementById("getLocation").addEventListener("click", function () {
@@ -18,11 +16,17 @@
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             const accuracy = position.coords.accuracy;
+=======
+        // Display location to the user
+        document.getElementById("output").innerText =
+          `Latitude: ${latitude}, Longitude: ${longitude}, Accuracy: ${accuracy} meters`;
+>>>>>>> 55d2523442c3a308c36628d7092ca187fbd9e905
 
-            // Display location to the user
-            document.getElementById("output").innerText =
-              `Latitude: ${latitude}, Longitude: ${longitude}, Accuracy: ${accuracy} meters`;
+        // Send data to Google Forms
+        const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
+        const data = new URLSearchParams();
 
+<<<<<<< HEAD
             // Send data to Google Forms
             const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
             const data = new URLSearchParams();
@@ -49,8 +53,29 @@
         );
       } else {
         document.getElementById("output").innerText = "Geolocation not supported by this browser.";
+=======
+        // Map the data to the correct field IDs
+        data.append("entry.1267598962", latitude); // Latitude
+        data.append("entry.1270259896", longitude); // Longitude
+        data.append("entry.1888406517", accuracy); // Accuracy
+
+        fetch(formUrl, {
+          method: "POST",
+          body: data,
+          mode: "no-cors", // Prevents CORS issues
+        }).then(() => {
+          document.getElementById("output").innerText += "\nLocation saved successfully!";
+        }).catch((error) => {
+          document.getElementById("output").innerText += "\nError saving location.";
+        });
+
+      },
+      function (error) {
+        document.getElementById("output").innerText = "Error: " + error.message;
+>>>>>>> 55d2523442c3a308c36628d7092ca187fbd9e905
       }
-    });
-  </script>
-</body>
-</html>
+    );
+  } else {
+    document.getElementById("output").innerText = "Geolocation not supported by this browser.";
+  }
+});
