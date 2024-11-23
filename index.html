@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Tracker</title>
+</head>
+<body>
+  <h1>Location Tracker</h1>
+  <p>Click the button below to share your location:</p>
+  <button id="getLocation">Get My Location</button>
+  <p id="output"></p>
+
+  <script>
+    document.getElementById("getLocation").addEventListener("click", function () {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+
+            // Display the location details to the user
+            document.getElementById("output").innerText =
+              `Latitude: ${latitude}, Longitude: ${longitude}, Accuracy: ${accuracy} meters`;
+
+            // Send the location to your server
+            fetch("https://your-server.com/track-location", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                latitude,
+                longitude,
+                accuracy,
+              }),
+            });
+          },
+          function (error) {
+            document.getElementById("output").innerText = "Error getting location: " + error.message;
+          }
+        );
+      } else {
+        document.getElementById("output").innerText = "Geolocation is not supported by this browser.";
+      }
+    });
+  </script>
+</body>
+</html>
