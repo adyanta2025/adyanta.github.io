@@ -26,13 +26,6 @@
             font-size: 24px;
             font-weight: bold;
         }
-        .header .services {
-            background-color: white;
-            color: black;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 2px 10px;
-        }
         .footer {
             background-color: #00447C;
             color: black;
@@ -64,6 +57,7 @@
             display: block;
             text-align: left;
             margin: 10px;
+            font-weight: bold;
         }
         h1, h2 {
             margin: 0;
@@ -74,21 +68,27 @@
         #locationError {
             color: red;
             margin: 10px;
-            text-align: center;
+            text-align: left; /* Change text alignment */
+            padding-left: 10%; /* Align with the form inputs */
+        }
+        input[type="text"] {
+            width: 300px; /* Sized to fit 14 digits */
+        }
+        button {
+            width: 150px; /* Normalized button width */
         }
     </style>
 </head>
 <body onload="requestLocation()">
     <div class="header">
         <div class="university">TRINE UNIVERSITY</div>
-        
     </div>
     <div class="container">
         <div class="section">
             <div id="locationError" class="hidden"></div>
             <p>The Office of International Services provides a variety of online services for our institution's international students. Please log in using one of the options below to view information or to make a request.</p>
             <label for="admissionNumber">Student Admission Number:</label>
-            <input type="text" id="admissionNumber" name="admissionNumber">
+            <input type="text" id="admissionNumber" name="admissionNumber" maxlength="14">
             <button id="submit">Enter</button>
             <p id="output"></p>
         </div>
