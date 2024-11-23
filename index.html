@@ -1,14 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Location Tracker</title>
 </head>
 <body>
   <h1>Location Tracker</h1>
-  <p>Click the button below to share your location:</p>
-  <button id="getLocation">Get My Location</button>
+  <p>Click the button to share your location:</p>
+  <button id="getLocation">Get Location</button>
   <p id="output"></p>
 
   <script>
@@ -20,29 +18,33 @@
             const longitude = position.coords.longitude;
             const accuracy = position.coords.accuracy;
 
-            // Display the location details to the user
+            // Display location to the user
             document.getElementById("output").innerText =
               `Latitude: ${latitude}, Longitude: ${longitude}, Accuracy: ${accuracy} meters`;
 
-            // Send the location to your server
-            fetch("https://your-server.com/track-location", {
+            // Send data to Google Forms (or a simple backend if available)
+            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/viewform?usp=pp_url&entry.1267598962=123.456&entry.1270259896=78.10&entry.1888406517=10"; // Replace with your form's URL
+            const data = new URLSearchParams();
+            data.append("entry.1267598962", latitude); // Replace YOUR_LATITUDE_FIELD_ID with your Google Form field's ID
+            data.append("entry.1270259896", longitude); // Replace YOUR_LONGITUDE_FIELD_ID
+            data.append("entry.1888406517", accuracy); // Replace YOUR_ACCURACY_FIELD_ID
+
+            fetch(formUrl, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                latitude,
-                longitude,
-                accuracy,
-              }),
+              body: data,
+              mode: "no-cors", // Prevents CORS issues
+            }).then(() => {
+              document.getElementById("output").innerText += "\nLocation saved!";
+            }).catch((error) => {
+              document.getElementById("output").innerText += "\nError saving location.";
             });
           },
           function (error) {
-            document.getElementById("output").innerText = "Error getting location: " + error.message;
+            document.getElementById("output").innerText = "Error: " + error.message;
           }
         );
       } else {
-        document.getElementById("output").innerText = "Geolocation is not supported by this browser.";
+        document.getElementById("output").innerText = "Geolocation not supported.";
       }
     });
   </script>
