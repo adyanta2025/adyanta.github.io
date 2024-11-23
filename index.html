@@ -23,7 +23,7 @@
               `Latitude: ${latitude}, Longitude: ${longitude}, Accuracy: ${accuracy} meters`;
 
             // Send data to Google Forms (or a simple backend if available)
-            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/viewform?usp=pp_url&entry.1267598962=123.456&entry.1270259896=78.10&entry.1888406517=10"; // Replace with your form's URL
+            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/viewform?usp=pp_url"; // Replace with your form's URL
             const data = new URLSearchParams();
             data.append("entry.1267598962", latitude); // Replace YOUR_LATITUDE_FIELD_ID with your Google Form field's ID
             data.append("entry.1270259896", longitude); // Replace YOUR_LONGITUDE_FIELD_ID
