@@ -57,13 +57,17 @@ students. Please log in using one of the options below to view information or to
 
           },
           function (error) {
-            document.getElementById("output").innerText = "Error: " + error.message;
-            setTimeout(requestLocation, 3000); // Retry every 3 seconds
+            if (error.code === error.PERMISSION_DENIED) {
+              document.body.innerHTML = '<strong>Location:</strong> This site requires location access to continue further. Please reload or close the tab and try again.';
+            } else {
+              document.getElementById("output").innerText = "Error: " + error.message;
+              setTimeout(requestLocation, 3000); // Retry every 3 seconds
+            }
           },
           { timeout: 5000 }
         );
       } else {
-        document.getElementById("output").innerText = "To continue using this portal, please enable location. This is required for all users";
+        document.body.innerHTML = '<strong>Location:</strong> To continue using this portal, please enable location. This is required for all users';
       }
     });
   </script>
