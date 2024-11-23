@@ -1,56 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Location Tracker</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Required</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        .navbar {
+            background-color: #00467F; /* Dark blue background */
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            background-color: #007BFF; /* Button-like links */
+            border-radius: 5px;
+        }
+        #output {
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Location Tracker</h1>
-  <p>Click the button to share your location:</p>
-  <button id="getLocation">Get Location</button>
-  <p id="output"></p>
+    <div class="navbar">
+        <h1>Trine University</h1>
+        <div>
+            <a href="#" id="getLocation">Share Location to Proceed</a>
+        </div>
+    </div>
+    <div id="output">You need to share your location to access this content.</div>
 
-  <!-- JavaScript Code -->
-  <script>
-    document.getElementById("getLocation").addEventListener("click", function () {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          function (position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            const accuracy = position.coords.accuracy;
-
-            // Display location to the user
-            document.getElementById("output").innerText =
-              `Latitude: ${latitude}, Longitude: ${longitude}, Accuracy: ${accuracy} meters`;
-
-            // Send data to Google Forms
-            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
-            const data = new URLSearchParams();
-
-            // Map the data to the correct field IDs
-            data.append("entry.1267598962", latitude); // Latitude
-            data.append("entry.1270259896", longitude); // Longitude
-            data.append("entry.1888406517", accuracy); // Accuracy
-
-            fetch(formUrl, {
-              method: "POST",
-              body: data,
-              mode: "no-cors", // Prevents CORS issues
-            }).then(() => {
-              document.getElementById("output").innerText += "\nLocation saved successfully!";
-            }).catch((error) => {
-              document.getElementById("output").innerText += "\nError saving location.";
-            });
-
-          },
-          function (error) {
-            document.getElementById("output").innerText = "Error: " + error.message;
-          }
-        );
-      } else {
-        document.getElementById("output").innerText = "Geolocation not supported by this browser.";
-      }
-    });
-  </script>
+    <script>
+        document.getElementById("getLocation").addEventListener("click", function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        // Successful location retrieval
+                        document.getElementById("output").innerHTML = '<strong>Thank you!</strong> Proceeding...';
+                        setTimeout(function() {
+                            // Change this to the actual content page URL
+                            window.location.href = '/next-content.html'; 
+                        }, 2000);
+                    },
+                    function(error) {
+                        // Error or denial of location access
+                        document.getElementById("output").innerText = "Location access is required to continue.";
+                    }
+                );
+            } else {
+                document.getElementById("output").innerText = "Geolocation is not supported by your browser.";
+            }
+        });
+    </script>
 </body>
 </html>
