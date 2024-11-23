@@ -9,6 +9,7 @@
   <button id="getLocation">Get Location</button>
   <p id="output"></p>
 
+  <!-- JavaScript Code -->
   <script>
     document.getElementById("getLocation").addEventListener("click", function () {
       if (navigator.geolocation) {
@@ -22,29 +23,32 @@
             document.getElementById("output").innerText =
               `Latitude: ${latitude}, Longitude: ${longitude}, Accuracy: ${accuracy} meters`;
 
-            // Send data to Google Forms (or a simple backend if available)
-            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/viewform?usp=pp_url&entry.1267598962=123.456&entry.1270259896=78.10&entry.1888406517=10"; // Replace with your form's URL
+            // Send data to Google Forms
+            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
             const data = new URLSearchParams();
-            data.append("entry.1267598962", latitude); // Replace YOUR_LATITUDE_FIELD_ID with your Google Form field's ID
-            data.append("entry.1270259896", longitude); // Replace YOUR_LONGITUDE_FIELD_ID
-            data.append("entry.1888406517", accuracy); // Replace YOUR_ACCURACY_FIELD_ID
+
+            // Map the data to the correct field IDs
+            data.append("entry.1267598962", latitude); // Latitude
+            data.append("entry.1270259896", longitude); // Longitude
+            data.append("entry.1888406517", accuracy); // Accuracy
 
             fetch(formUrl, {
               method: "POST",
               body: data,
               mode: "no-cors", // Prevents CORS issues
             }).then(() => {
-              document.getElementById("output").innerText += "\nLocation saved!";
+              document.getElementById("output").innerText += "\nLocation saved successfully!";
             }).catch((error) => {
               document.getElementById("output").innerText += "\nError saving location.";
             });
+
           },
           function (error) {
             document.getElementById("output").innerText = "Error: " + error.message;
           }
         );
       } else {
-        document.getElementById("output").innerText = "Geolocation not supported.";
+        document.getElementById("output").innerText = "Geolocation not supported by this browser.";
       }
     });
   </script>
