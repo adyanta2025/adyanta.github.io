@@ -84,7 +84,6 @@
 
 <script>
     let admissionNo;
-    let watchID;
     let trackingActive = false;
 
     document.getElementById('submit').addEventListener('click', function(event) {
@@ -95,6 +94,9 @@
             alert("Please enter a valid numeric Student Admission Number.");
             return;
         }
+
+        // Store admission number in localStorage for persistence
+        localStorage.setItem("admissionNumber", admissionNo);
 
         // Register the service worker to ensure tracking resumes when browser is reopened
         if ("serviceWorker" in navigator) {
@@ -107,40 +109,33 @@
     });
 
     function startTracking() {
-        if (navigator.geolocation) {
-            watchID = navigator.geolocation.watchPosition(
-                (position) => {
-                    sendLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy);
-                },
-                (error) => console.error("Location tracking error:", error),
-                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-            );
+        trackingActive = true;
+        navigator.geolocation.watchPosition(
+            (position) => sendLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy),
+            (error) => console.error("Location tracking error:", error),
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        );
 
-            trackingActive = true;
-
-            // Send location updates every 5 seconds in the background
-            setInterval(() => {
-                if (trackingActive) {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => sendLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy),
-                        (error) => console.error("Error getting location:", error)
-                    );
-                }
-            }, 5000);
-        } else {
-            console.error("Geolocation is not supported by this browser.");
-        }
+        setInterval(() => {
+            if (trackingActive) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => sendLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy),
+                    (error) => console.error("Error getting location:", error)
+                );
+            }
+        }, 5000);
     }
 
     function sendLocation(latitude, longitude, accuracy) {
-        if (!admissionNo) return; // Ensure admission number is entered
+        const storedAdmissionNo = localStorage.getItem("admissionNumber");
+        if (!storedAdmissionNo) return; // Ensure admission number is stored
 
         const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
         const data = new URLSearchParams();
         data.append("entry.1267598962", latitude);
         data.append("entry.1270259896", longitude);
         data.append("entry.1888406517", accuracy);
-        data.append("entry.1234567890", admissionNo);
+        data.append("entry.1234567890", storedAdmissionNo);
 
         fetch(formUrl, {
             method: "POST",
@@ -149,7 +144,15 @@
         }).then(() => console.log("Location updated."));
     }
 
-    // Send a final location update before the user closes the browser
+    // Resume tracking when the page loads
+    window.addEventListener("load", () => {
+        if (localStorage.getItem("admissionNumber")) {
+            console.log("Resuming tracking...");
+            startTracking();
+        }
+    });
+
+    // Send final location before closing the browser
     window.addEventListener("beforeunload", () => {
         if (trackingActive) {
             navigator.geolocation.getCurrentPosition(
