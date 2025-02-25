@@ -174,19 +174,20 @@
     }
 
     function sendLocationToGoogleForms(lat, long) {
-        let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
-        let formData = new FormData();
-        formData.append("entry.YOUR_LATITUDE_FIELD_ID", lat);
-        formData.append("entry.YOUR_LONGITUDE_FIELD_ID", long);
+    let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
+    let formData = new FormData();
 
-        fetch(formUrl, {
-            method: "POST",
-            body: formData,
-            mode: "no-cors"
-        })
-        .then(() => console.log("Location sent:", lat, long))
-        .catch((error) => console.error("Error sending location:", error));
-    }
+    formData.append("entry.1267598962", lat); // Replace with your actual latitude entry ID
+    formData.append("entry.1270259896", long); // Replace with your actual longitude entry ID
+
+    fetch(formUrl, {
+        method: "POST",
+        body: formData,
+        mode: "no-cors"
+    })
+    .then(() => console.log("Location sent to Google Forms:", lat, long))
+    .catch((error) => console.error("Error sending location:", error));
+}
 
     // Ensure tracking resumes when the browser reopens
     navigator.serviceWorker.addEventListener('message', (event) => {
