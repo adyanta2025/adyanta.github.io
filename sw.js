@@ -19,7 +19,7 @@ self.addEventListener("fetch", (event) => {
     }
 });
 
-// Background sync for offline data sending
+// Background sync for location updates
 self.addEventListener("sync", (event) => {
     if (event.tag === "syncLocation") {
         event.waitUntil(
