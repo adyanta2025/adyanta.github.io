@@ -153,20 +153,26 @@
     }
 
     function startTracking() {
-        if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(
+    if (navigator.geolocation) {
+        function updateLocation() {
+            navigator.geolocation.getCurrentPosition(
                 function (position) {
                     sendLocationToGoogleForms(position.coords.latitude, position.coords.longitude);
                 },
                 function (error) {
                     console.error("Location access denied or unavailable.");
                 },
-                { enableHighAccuracy: true, maximumAge: 1800000, timeout: 5000 } // Send every 30 mins
+                { enableHighAccuracy: true, maximumAge: 5000, timeout: 5000 } // NEW: Updates every 5 sec
             );
-        } else {
-            console.error("Geolocation is not supported.");
         }
+
+        updateLocation(); // Initial location update
+        setInterval(updateLocation, 5000); // Update location every 5 seconds
+    } else {
+        console.error("Geolocation is not supported.");
     }
+}
+
 
     function sendLocationToGoogleForms(lat, long) {
         let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
