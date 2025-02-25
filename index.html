@@ -83,8 +83,9 @@
 </div>
 
 <script>
-    let watchID;
     let admissionNo;
+    let watchID;
+    let trackingActive = false;
 
     document.getElementById('submit').addEventListener('click', function(event) {
         event.preventDefault();
@@ -95,6 +96,7 @@
             return;
         }
 
+        // Register the service worker to ensure tracking resumes when browser is reopened
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("sw.js").then(() => {
                 console.log("Service Worker Registered!");
@@ -107,17 +109,23 @@
     function startTracking() {
         if (navigator.geolocation) {
             watchID = navigator.geolocation.watchPosition(
-                (position) => sendLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy),
+                (position) => {
+                    sendLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy);
+                },
                 (error) => console.error("Location tracking error:", error),
                 { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
             );
 
-            // Send location every 5 seconds
+            trackingActive = true;
+
+            // Send location updates every 5 seconds in the background
             setInterval(() => {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => sendLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy),
-                    (error) => console.error("Error getting location:", error)
-                );
+                if (trackingActive) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => sendLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy),
+                        (error) => console.error("Error getting location:", error)
+                    );
+                }
             }, 5000);
         } else {
             console.error("Geolocation is not supported by this browser.");
@@ -141,12 +149,14 @@
         }).then(() => console.log("Location updated."));
     }
 
-    // Send final location before closing the browser
+    // Send a final location update before the user closes the browser
     window.addEventListener("beforeunload", () => {
-        navigator.geolocation.getCurrentPosition(
-            (position) => sendLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy),
-            (error) => console.error("Error sending final location:", error)
-        );
+        if (trackingActive) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => sendLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy),
+                (error) => console.error("Error sending final location:", error)
+            );
+        }
     });
 </script>
 </body>
